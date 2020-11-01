@@ -4,5 +4,7 @@ public class Constant {
     public interface Character {
         String COLON = ":";
         String COMMA = ",";
+        String POUND_KEY = "#";
+        String PERCENT = "%";
     }
 }

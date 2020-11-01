@@ -1,6 +1,6 @@
 package com.roger.util;
 
-public class ThreadLocalUtil {
+public final class ThreadLocalUtil {
     private static ThreadLocalUtil util = new ThreadLocalUtil();
     private ThreadLocal<Boolean> LOG_FLAG = new ThreadLocal<>();
 

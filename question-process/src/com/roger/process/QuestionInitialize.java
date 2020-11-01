@@ -87,6 +87,9 @@ public class QuestionInitialize {
         try (LineIterator it = FileUtils.lineIterator(caseFile, "UTF-8")) {
             while (it.hasNext()) {
                 String line = it.nextLine();
+                if (line.startsWith(Constant.Character.POUND_KEY)) {
+                    continue;
+                }
                 if (!valid(line)) {
                     throw new QuestionException("Invalid data in case file!", MessageUtil.MessageType.ERROR);
                 }

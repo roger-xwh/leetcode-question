@@ -1,10 +1,12 @@
 package com.roger.process;
 
+import com.roger.constant.Constant;
 import com.roger.constant.QuestionType;
 import com.roger.exception.QuestionException;
 import com.roger.util.LogUtil;
 import com.roger.util.MessageUtil;
 import com.roger.util.ThreadLocalUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -22,9 +24,9 @@ public class QuestionProcess {
             Method method = getMethod(questionClass, questionType.getMethodName());
             QuestionInitialize initialize = new QuestionInitialize(questionType.getClassName(), method.getParameterTypes(), method.getReturnType());
             BigDecimal result = initialize.executeCase(questionClass, method);
-            LogUtil.log(questionType.getName() + "通过率: " + result.multiply(new BigDecimal(100)).setScale(2).toPlainString());
+            LogUtil.log(questionType.getName() + " 通过率: " + result.multiply(new BigDecimal(100)).setScale(2).toPlainString() + Constant.Character.PERCENT);
         } catch (QuestionException e) {
-            LogUtil.logWithFlag(e.getLocalizedMessage());
+            LogUtil.logWithFlag(questionType.getName() + StringUtils.SPACE + e.getLocalizedMessage());
         }
     }
 
@@ -46,9 +48,5 @@ public class QuestionProcess {
         } else {
             throw new QuestionException("Not exist method in the solution class!", MessageUtil.MessageType.ERROR);
         }
-    }
-
-    public static void main(String[] args) {
-        new QuestionProcess(true).execute(QuestionType.TWO_NUMBER_SUM);
     }
 }
