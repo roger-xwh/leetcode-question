@@ -7,6 +7,7 @@ import com.roger.util.LogUtil;
 import com.roger.util.MessageUtil;
 import com.roger.util.ThreadLocalUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -23,10 +24,12 @@ public class QuestionProcess {
             Class questionClass = getClass(questionType.getClassName());
             Method method = getMethod(questionClass, questionType.getMethodName());
             QuestionInitialize initialize = new QuestionInitialize(questionType.getClassName(), method.getParameterTypes(), method.getReturnType());
-            BigDecimal result = initialize.executeCase(questionClass, method);
-            LogUtil.log(questionType.getName() + " 通过率: " + result.multiply(new BigDecimal(100)).setScale(2).toPlainString() + Constant.Character.PERCENT);
+            Pair<Integer, BigDecimal> result = initialize.executeCase(questionClass, method);
+
+            LogUtil.log(String.format("%s Case Count: %d, Pass Rate: %s", questionType.getName(), result.getLeft().intValue(), result.getRight().multiply(new BigDecimal(100)).setScale(2).toPlainString() + Constant.Character.PERCENT));
         } catch (QuestionException e) {
             LogUtil.logWithFlag(questionType.getName() + StringUtils.SPACE + e.getLocalizedMessage());
+            LogUtil.log(String.format("%s Execute exception: ", questionType.getName(), e.getLocalizedMessage()));
         }
     }
 

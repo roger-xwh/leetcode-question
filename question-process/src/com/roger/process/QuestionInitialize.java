@@ -1,21 +1,24 @@
 package com.roger.process;
 
 import com.roger.constant.Constant;
+import com.roger.entity.ListNode;
 import com.roger.exception.QuestionException;
 import com.roger.util.LogUtil;
 import com.roger.util.MessageUtil;
 import com.roger.util.ObjectParseUtil;
+import com.roger.util.ReturnEqualUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +36,7 @@ public class QuestionInitialize {
         readCase(new File(filePath));
     }
 
-    public BigDecimal executeCase(Class questionClass, Method method) throws QuestionException {
+    public Pair<Integer, BigDecimal> executeCase(Class questionClass, Method method) throws QuestionException {
         if (params.isEmpty() && results.isEmpty()) {
             throw new QuestionException("No case in case file!", MessageUtil.MessageType.WARN);
         }
@@ -44,13 +47,14 @@ public class QuestionInitialize {
         int success = 0;
         for (int i = 0; i < params.size(); i++) {
             paramList = (ArrayList) params.get(i);
-            Boolean result = executeOne(questionClass, method, paramList.toArray(new Object[0]), results.get(i));
+            boolean result = executeOne(questionClass, method, paramList.toArray(new Object[0]), results.get(i));
             success += result ? 1 : 0;
         }
-        return new BigDecimal(success).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
+        BigDecimal result = new BigDecimal(success).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
+        return new ImmutablePair<>(params.size(), result);
     }
 
-    private Boolean executeOne(Class questionClass, Method method, Object[] args, Object expect) throws QuestionException {
+    private boolean executeOne(Class questionClass, Method method, Object[] args, Object expect) throws QuestionException {
         try {
             Object result = method.invoke(questionClass.newInstance(), args);
             return compareReturn(expect, result);
@@ -59,9 +63,12 @@ public class QuestionInitialize {
         }
     }
 
-    private boolean compareReturn(Object expect, Object result) {
+    private boolean compareReturn(Object expect, Object result) throws QuestionException {
         try {
             Class<?> type = fieldTypes[fieldTypes.length - 1];
+            if (!(expect != null && result != null)) {
+                return false;
+            }
             if (!expect.getClass().equals(type)) {
                 LogUtil.logWithFlag(MessageUtil.newError("Failed to parse return for expect!"));
                 return false;
@@ -70,15 +77,17 @@ public class QuestionInitialize {
                 LogUtil.logWithFlag(MessageUtil.newError("Failed to parse return for actual!"));
                 return false;
             }
-            switch (type.getName()) {
+            String typeName = getTypeName(type);
+            switch (typeName) {
                 case "[I":
-                    return Arrays.equals((int[]) expect, (int[]) result);
+                    return ReturnEqualUtil.equalIntArray((int[]) expect, (int[]) result);
+                case "ListNode":
+                    return ReturnEqualUtil.equalListNode((ListNode) expect, (ListNode) result);
                 default:
-                    return StringUtils.equals(String.valueOf(expect), String.valueOf(result));
+                    return ReturnEqualUtil.equalString(String.valueOf(expect), String.valueOf(result));
             }
         } catch (Exception e) {
-            LogUtil.logWithFlag(MessageUtil.newError("Failed to parse return!"));
-            return false;
+            throw new QuestionException("Failed to parse return!", MessageUtil.MessageType.ERROR);
         }
     }
 
@@ -122,17 +131,28 @@ public class QuestionInitialize {
         int typeIndex = index == 0 ? fieldTypes.length - 1 : index - 1;
         Class<?> type = fieldTypes[typeIndex];
         try {
-            switch (type.getName()) {
+            String typeName = getTypeName(type);
+            switch (typeName) {
                 case "int":
                     return Optional.ofNullable(ObjectParseUtil.toInt(value));
                 case "[I":
                     return Optional.ofNullable(ObjectParseUtil.toIntArray(value));
+                case "ListNode":
+                    return Optional.ofNullable(ObjectParseUtil.toListNode(value));
                 default:
                     return Optional.ofNullable(value);
             }
         } catch (QuestionException e) {
             return Optional.empty();
         }
+    }
+
+    private String getTypeName(Class<?> type) {
+        String typeName = type.getName();
+        if (typeName.indexOf(Constant.Character.POINT) > 0) {
+            typeName = typeName.substring(typeName.lastIndexOf(Constant.Character.POINT) + 1);
+        }
+        return typeName;
     }
 
     private boolean valid(String lineString) {

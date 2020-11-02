@@ -1,6 +1,7 @@
 package com.roger.util;
 
 import com.roger.constant.Constant;
+import com.roger.entity.ListNode;
 import com.roger.exception.QuestionException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,5 +24,18 @@ public class ObjectParseUtil {
             result[i] = toInt(values[i]);
         }
         return result;
+    }
+
+    public static ListNode toListNode(String value) {
+        String[] values = value.split(Constant.Character.NODE_NEXT);
+        ListNode node = null;
+        ListNode next = null;
+        for (int i = values.length - 1; i >= 0; i--) {
+            if (node != null) {
+                next = node;
+            }
+            node = new ListNode(Integer.parseInt(values[i]), next);
+        }
+        return node;
     }
 }

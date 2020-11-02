@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TwoNumberSum {
+public class TwoSum {
     public int[] twoSum(int[] nums, int target) {
         return method3(nums, target);
     }

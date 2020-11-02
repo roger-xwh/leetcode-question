@@ -6,5 +6,7 @@ public class Constant {
         String COMMA = ",";
         String POUND_KEY = "#";
         String PERCENT = "%";
+        String POINT = ".";
+        String NODE_NEXT = "->";
     }
 }
