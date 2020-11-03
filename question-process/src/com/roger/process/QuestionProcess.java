@@ -2,6 +2,7 @@ package com.roger.process;
 
 import com.roger.constant.Constant;
 import com.roger.constant.QuestionType;
+import com.roger.entity.ExecuteResult;
 import com.roger.exception.QuestionException;
 import com.roger.util.LogUtil;
 import com.roger.util.MessageUtil;
@@ -24,9 +25,9 @@ public class QuestionProcess {
             Class questionClass = getClass(questionType.getClassName());
             Method method = getMethod(questionClass, questionType.getMethodName());
             QuestionInitialize initialize = new QuestionInitialize(questionType.getClassName(), method.getParameterTypes(), method.getReturnType());
-            Pair<Integer, BigDecimal> result = initialize.executeCase(questionClass, method);
-
-            LogUtil.log(String.format("%s Case Count: %d, Pass Rate: %s", questionType.getName(), result.getLeft().intValue(), result.getRight().multiply(new BigDecimal(100)).setScale(2).toPlainString() + Constant.Character.PERCENT));
+            ExecuteResult result = initialize.executeCase(questionClass, method);
+            LogUtil.log(String.format("%s (avg)Time use: %sms, Memory use: %sKB", questionType.getName(), result.getUseTime().toPlainString(), result.getUseMemory().toPlainString()));
+            LogUtil.log(String.format("%s Case Count: %d, Pass Rate: %s", questionType.getName(), result.getCaseCount(), result.getPassRate().multiply(new BigDecimal(100)).setScale(2).toPlainString() + Constant.Character.PERCENT));
         } catch (QuestionException e) {
             LogUtil.logWithFlag(questionType.getName() + StringUtils.SPACE + e.getLocalizedMessage());
             LogUtil.log(String.format("%s Execute exception: ", questionType.getName(), e.getLocalizedMessage()));

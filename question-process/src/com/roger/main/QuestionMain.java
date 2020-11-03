@@ -8,6 +8,6 @@ public class QuestionMain {
         // 1:两数之和
         new QuestionProcess(false).execute(QuestionType.TWO_SUM);
         // 2:两数相加
-        new QuestionProcess(true).execute(QuestionType.TWO_ADD);
+        new QuestionProcess(false).execute(QuestionType.TWO_ADD);
     }
 }

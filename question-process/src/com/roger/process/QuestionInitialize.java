@@ -1,6 +1,7 @@
 package com.roger.process;
 
 import com.roger.constant.Constant;
+import com.roger.entity.ExecuteResult;
 import com.roger.entity.ListNode;
 import com.roger.exception.QuestionException;
 import com.roger.util.LogUtil;
@@ -36,7 +37,7 @@ public class QuestionInitialize {
         readCase(new File(filePath));
     }
 
-    public Pair<Integer, BigDecimal> executeCase(Class questionClass, Method method) throws QuestionException {
+    public ExecuteResult executeCase(Class questionClass, Method method) throws QuestionException {
         if (params.isEmpty() && results.isEmpty()) {
             throw new QuestionException("No case in case file!", MessageUtil.MessageType.WARN);
         }
@@ -45,13 +46,26 @@ public class QuestionInitialize {
         }
         ArrayList paramList;
         int success = 0;
+        int timeSum = 0;
+        int memorySum = 0;
         for (int i = 0; i < params.size(); i++) {
+            long startTime = System.currentTimeMillis();
+            long startMemory = getUsedMemory();
             paramList = (ArrayList) params.get(i);
             boolean result = executeOne(questionClass, method, paramList.toArray(new Object[0]), results.get(i));
             success += result ? 1 : 0;
+            timeSum += System.currentTimeMillis() - startTime;
+            memorySum += getUsedMemory() - startMemory;
         }
         BigDecimal result = new BigDecimal(success).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
-        return new ImmutablePair<>(params.size(), result);
+        BigDecimal usedTime = new BigDecimal(timeSum).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
+        BigDecimal usedMemory = new BigDecimal(memorySum).divide(new BigDecimal(1024), 6, BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
+        return ExecuteResult.builder().useTime(usedTime).useMemory(usedMemory).caseCount(params.size()).passRate(result);
+    }
+
+    private long getUsedMemory() {
+        Runtime runtime = Runtime.getRuntime();
+        return runtime.totalMemory() - runtime.freeMemory();
     }
 
     private boolean executeOne(Class questionClass, Method method, Object[] args, Object expect) throws QuestionException {

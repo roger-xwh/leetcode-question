@@ -1,8 +1,8 @@
 package com.roger.constant;
 
 public enum QuestionType {
-    TWO_SUM("[两数之和]", "TwoSum", "twoSum"),
-    TWO_ADD("[两数相加]", "TwoAdd", "twoAdd");
+    TWO_SUM("[Two Number Sum]", "TwoSum", "twoSum"),
+    TWO_ADD("[Two Number Add]", "TwoAdd", "twoAdd");
     private String name;
     private String className;
     private String methodName;
