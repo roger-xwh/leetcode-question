@@ -8,7 +8,6 @@ import com.roger.util.LogUtil;
 import com.roger.util.MessageUtil;
 import com.roger.util.ThreadLocalUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -23,7 +22,7 @@ public class QuestionProcess {
     public void execute(QuestionType questionType) {
         try {
             Class questionClass = getClass(questionType.getClassName());
-            Method method = getMethod(questionClass, questionType.getMethodName());
+            Method method = getMethod(questionClass, Constant.DEFAULT_METHOD_NAME);
             QuestionInitialize initialize = new QuestionInitialize(questionType.getClassName(), method.getParameterTypes(), method.getReturnType());
             ExecuteResult result = initialize.executeCase(questionClass, method);
             LogUtil.log(String.format("%s (avg)Time use: %sms, Memory use: %sKB", questionType.getName(), result.getUseTime().toPlainString(), result.getUseMemory().toPlainString()));

@@ -9,4 +9,6 @@ public class Constant {
         String POINT = ".";
         String NODE_NEXT = "->";
     }
+
+    public static final String DEFAULT_METHOD_NAME = "execute";
 }

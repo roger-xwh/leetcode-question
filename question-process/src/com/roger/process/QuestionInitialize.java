@@ -12,8 +12,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,20 +44,28 @@ public class QuestionInitialize {
         }
         ArrayList paramList;
         int success = 0;
-        int timeSum = 0;
-        int memorySum = 0;
+        int timeSum = 0, timeSumCount = 0;
+        int memorySum = 0, memorySumCount = 0;
         for (int i = 0; i < params.size(); i++) {
             long startTime = System.currentTimeMillis();
             long startMemory = getUsedMemory();
             paramList = (ArrayList) params.get(i);
             boolean result = executeOne(questionClass, method, paramList.toArray(new Object[0]), results.get(i));
             success += result ? 1 : 0;
-            timeSum += System.currentTimeMillis() - startTime;
-            memorySum += getUsedMemory() - startMemory;
+            long usedTime = System.currentTimeMillis() - startTime;
+            if (usedTime > 0) {
+                timeSum += usedTime;
+                timeSumCount++;
+            }
+            long usedMemory = getUsedMemory() - startMemory;
+            if (usedMemory > 0) {
+                memorySum += usedMemory;
+                memorySumCount++;
+            }
         }
         BigDecimal result = new BigDecimal(success).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
-        BigDecimal usedTime = new BigDecimal(timeSum).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
-        BigDecimal usedMemory = new BigDecimal(memorySum).divide(new BigDecimal(1024), 6, BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(params.size()), 4, BigDecimal.ROUND_HALF_UP);
+        BigDecimal usedTime = timeSumCount == 0 ? BigDecimal.ZERO : new BigDecimal(timeSum).divide(new BigDecimal(timeSumCount), 4, BigDecimal.ROUND_HALF_UP);
+        BigDecimal usedMemory = memorySumCount == 0 ? BigDecimal.ZERO : new BigDecimal(memorySum).divide(new BigDecimal(1024), 6, BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(memorySumCount), 4, BigDecimal.ROUND_HALF_UP);
         return ExecuteResult.builder().useTime(usedTime).useMemory(usedMemory).caseCount(params.size()).passRate(result);
     }
 
@@ -83,25 +89,39 @@ public class QuestionInitialize {
             if (!(expect != null && result != null)) {
                 return false;
             }
-            if (!expect.getClass().equals(type)) {
+            if (!getClassName(expect.getClass().getName()).equals(type.getName())) {
                 LogUtil.logWithFlag(MessageUtil.newError("Failed to parse return for expect!"));
                 return false;
             }
-            if (!result.getClass().equals(type)) {
+            if (!getClassName(result.getClass().getName()).equals(type.getName())) {
                 LogUtil.logWithFlag(MessageUtil.newError("Failed to parse return for actual!"));
                 return false;
             }
-            String typeName = getTypeName(type);
+            String typeName = getLastName(type.getName());
             switch (typeName) {
                 case "[I":
                     return ReturnEqualUtil.equalIntArray((int[]) expect, (int[]) result);
                 case "ListNode":
                     return ReturnEqualUtil.equalListNode((ListNode) expect, (ListNode) result);
+                case "int":
+                    return ReturnEqualUtil.equalInt(Integer.parseInt(String.valueOf(expect)), Integer.parseInt(String.valueOf(result)));
                 default:
                     return ReturnEqualUtil.equalString(String.valueOf(expect), String.valueOf(result));
             }
         } catch (Exception e) {
             throw new QuestionException("Failed to parse return!", MessageUtil.MessageType.ERROR);
+        }
+    }
+
+    private String getClassName(String name) {
+        String className = getLastName(name);
+        switch (className) {
+            case "Integer":
+                return "int";
+            case "Double":
+                return "double";
+            default:
+                return className;
         }
     }
 
@@ -145,7 +165,7 @@ public class QuestionInitialize {
         int typeIndex = index == 0 ? fieldTypes.length - 1 : index - 1;
         Class<?> type = fieldTypes[typeIndex];
         try {
-            String typeName = getTypeName(type);
+            String typeName = getLastName(type.getName());
             switch (typeName) {
                 case "int":
                     return Optional.ofNullable(ObjectParseUtil.toInt(value));
@@ -153,6 +173,8 @@ public class QuestionInitialize {
                     return Optional.ofNullable(ObjectParseUtil.toIntArray(value));
                 case "ListNode":
                     return Optional.ofNullable(ObjectParseUtil.toListNode(value));
+                case "double":
+                    return Optional.ofNullable(ObjectParseUtil.toDouble(value));
                 default:
                     return Optional.ofNullable(value);
             }
@@ -161,12 +183,8 @@ public class QuestionInitialize {
         }
     }
 
-    private String getTypeName(Class<?> type) {
-        String typeName = type.getName();
-        if (typeName.indexOf(Constant.Character.POINT) > 0) {
-            typeName = typeName.substring(typeName.lastIndexOf(Constant.Character.POINT) + 1);
-        }
-        return typeName;
+    private String getLastName(String name) {
+        return name.indexOf(Constant.Character.POINT) > 0 ? name.substring(name.lastIndexOf(Constant.Character.POINT) + 1) : name;
     }
 
     private boolean valid(String lineString) {
@@ -174,6 +192,6 @@ public class QuestionInitialize {
             return false;
         }
         String[] values = lineString.split(Constant.Character.COLON, -1);
-        return values.length == 2 && values[0].matches("(P[1-9])|(R0)") && StringUtils.isNotBlank(values[1]);
+        return values.length == 2 && values[0].matches("(P[1-9])|(R0)");
     }
 }

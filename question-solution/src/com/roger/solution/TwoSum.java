@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TwoSum {
-    public int[] twoSum(int[] nums, int target) {
+    public int[] execute(int[] nums, int target) {
         return method3(nums, target);
     }
 

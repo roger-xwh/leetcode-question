@@ -6,8 +6,12 @@ import com.roger.process.QuestionProcess;
 public class QuestionMain {
     public static void main(String[] args) {
         // 1:两数之和
-        new QuestionProcess(false).execute(QuestionType.TWO_SUM);
+        //new QuestionProcess(false).execute(QuestionType.TWO_SUM);
         // 2:两数相加
-        new QuestionProcess(false).execute(QuestionType.TWO_ADD);
+        //new QuestionProcess(false).execute(QuestionType.TWO_ADD);
+        // 3:无重复字符的最长子串
+        //new QuestionProcess(true).execute(QuestionType.LONGEST_SUBSTRING);
+        // 4:寻找两个正序数组的中位数
+        new QuestionProcess(true).execute(QuestionType.FIND_MEDIAN);
     }
 }

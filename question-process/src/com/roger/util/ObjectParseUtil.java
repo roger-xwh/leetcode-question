@@ -5,6 +5,8 @@ import com.roger.entity.ListNode;
 import com.roger.exception.QuestionException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+
 public class ObjectParseUtil {
     public static int toInt(String value) throws QuestionException {
         if (StringUtils.isNumeric(value)) {
@@ -18,6 +20,9 @@ public class ObjectParseUtil {
     }
 
     public static int[] toIntArray(String value) throws QuestionException {
+        if (value.isEmpty()) {
+            return new int[0];
+        }
         String[] values = value.split(Constant.Character.COMMA, -1);
         int[] result = new int[values.length];
         for (int i = 0; i < values.length; i++) {
@@ -37,5 +42,12 @@ public class ObjectParseUtil {
             node = new ListNode(Integer.parseInt(values[i]), next);
         }
         return node;
+    }
+
+    public static double toDouble(String value) {
+        if (value.isEmpty()) {
+            return 0;
+        }
+        return new BigDecimal(value).setScale(5, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 }

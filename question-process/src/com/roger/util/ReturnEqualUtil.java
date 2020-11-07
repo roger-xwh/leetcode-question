@@ -35,4 +35,8 @@ public class ReturnEqualUtil {
             return node1 == null && node2 == null;
         }
     }
+
+    public static boolean equalInt(int expect, int actual) {
+        return expect == actual;
+    }
 }
