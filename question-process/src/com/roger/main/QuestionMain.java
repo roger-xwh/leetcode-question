@@ -12,6 +12,8 @@ public class QuestionMain {
         // 3:无重复字符的最长子串
         //new QuestionProcess(true).execute(QuestionType.LONGEST_SUBSTRING);
         // 4:寻找两个正序数组的中位数
-        new QuestionProcess(true).execute(QuestionType.FIND_MEDIAN);
+        // new QuestionProcess(true).execute(QuestionType.FIND_MEDIAN);
+        // 5:最长回文子串
+        new QuestionProcess(true).execute(QuestionType.PALINDROME);
     }
 }

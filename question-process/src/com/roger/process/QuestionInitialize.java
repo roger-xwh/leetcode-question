@@ -89,11 +89,11 @@ public class QuestionInitialize {
             if (!(expect != null && result != null)) {
                 return false;
             }
-            if (!getClassName(expect.getClass().getName()).equals(type.getName())) {
+            if (!getClassName(expect.getClass().getName()).equals(getClassName(type.getName()))) {
                 LogUtil.logWithFlag(MessageUtil.newError("Failed to parse return for expect!"));
                 return false;
             }
-            if (!getClassName(result.getClass().getName()).equals(type.getName())) {
+            if (!getClassName(result.getClass().getName()).equals(getClassName(type.getName()))) {
                 LogUtil.logWithFlag(MessageUtil.newError("Failed to parse return for actual!"));
                 return false;
             }

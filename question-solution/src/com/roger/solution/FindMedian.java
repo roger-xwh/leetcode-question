@@ -8,7 +8,7 @@ public class FindMedian {
     }
 
     /**
-     * 比O(log(m+n))更优的时间复杂度O(min(logm, logn)，采用了将数组一分为二的策略
+     * 比O(log(m+n))更优的时间复杂度O(log（min（m，n）），采用了将数组一分为二的策略
      *
      * @param nums1
      * @param nums2
@@ -19,16 +19,17 @@ public class FindMedian {
         if (len1 > len2) {
             return method4(nums2, nums1);
         }
-        int left = 0, right = len1;
+        int left = 0, right = len1, i, j;
         int median1 = 0, median2 = 0;
+        int num1_left, num1_right, num2_left, num2_right;
         while (left <= right) {
-            int i = (left + right) / 2;
-            int j = (len1 + len2 + 1) / 2 - i;
+            i = (left + right) / 2;
+            j = (len1 + len2 + 1) / 2 - i;
 
-            int num1_left = i == 0 ? Integer.MIN_VALUE : nums1[i - 1];
-            int num1_right = i == len1 ? Integer.MAX_VALUE : nums1[i];
-            int num2_left = j == 0 ? Integer.MIN_VALUE : nums2[j - 1];
-            int num2_right = j == len2 ? Integer.MAX_VALUE : nums2[j];
+            num1_left = i == 0 ? Integer.MIN_VALUE : nums1[i - 1];
+            num1_right = i == len1 ? Integer.MAX_VALUE : nums1[i];
+            num2_left = j == 0 ? Integer.MIN_VALUE : nums2[j - 1];
+            num2_right = j == len2 ? Integer.MAX_VALUE : nums2[j];
 
             if (num1_left < num2_right) {
                 median1 = Math.max(num1_left, num2_left);
