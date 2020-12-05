@@ -14,6 +14,10 @@ public class QuestionMain {
         // 4:寻找两个正序数组的中位数
         // new QuestionProcess(true).execute(QuestionType.FIND_MEDIAN);
         // 5:最长回文子串
-        new QuestionProcess(true).execute(QuestionType.PALINDROME);
+        // new QuestionProcess(true).execute(QuestionType.PALINDROME);
+        // 6:Z字形变换
+//        new QuestionProcess(true).execute(QuestionType.Z_PRINT);
+        // 7:整数反转
+        new QuestionProcess(true).execute(QuestionType.NUMBER_REVERSE);
     }
 }

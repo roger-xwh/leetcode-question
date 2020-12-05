@@ -5,11 +5,11 @@ import java.util.HashMap;
 
 public class Palindrome {
     public String execute(String s) {
-        return method3(s);
+        return method3(s);                                                                                                                                                                                                                                       
     }
 
     /**
-     * 中心规划法
+     * 中心规划法(官方最优解）
      *
      * @param s
      * @return

@@ -79,7 +79,9 @@ public class QuestionInitialize {
             Object result = method.invoke(questionClass.newInstance(), args);
             return compareReturn(expect, result);
         } catch (Exception e) {
-            throw new QuestionException("Failed to execute solution method!", MessageUtil.MessageType.ERROR);
+            LogUtil.logWithFlag(e.getLocalizedMessage(), e);
+            return false;
+//            throw new QuestionException("Failed to execute solution method!", MessageUtil.MessageType.ERROR);
         }
     }
 

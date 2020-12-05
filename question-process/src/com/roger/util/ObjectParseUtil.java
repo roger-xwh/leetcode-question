@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 public class ObjectParseUtil {
     public static int toInt(String value) throws QuestionException {
-        if (StringUtils.isNumeric(value)) {
+        if (StringUtils.isNotBlank(value)) {
             try {
                 return Integer.parseInt(value);
             } catch (NumberFormatException e) {

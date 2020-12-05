@@ -5,7 +5,9 @@ public enum QuestionType {
     TWO_ADD("[Two Number Add]", "TwoAdd"),
     LONGEST_SUBSTRING("[Longest Substring]", "LongestSubstring"),
     FIND_MEDIAN("[Find Median Sorted Array]", "FindMedian"),
-    PALINDROME("[Longest Palindrome]", "Palindrome");
+    PALINDROME("[Longest Palindrome]", "Palindrome"),
+    Z_PRINT("[ZPrint convert]", "ZPrint"),
+    NUMBER_REVERSE("[Integer Number Reverse]", "NumberReverse");
     private String name;
     private String className;
 
